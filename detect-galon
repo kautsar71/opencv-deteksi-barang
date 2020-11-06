@@ -1,0 +1,40 @@
+import cv2
+import numpy as np
+
+img = cv2.imread('galon.jpg', 1)
+hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+lower_range = np.array([50, 50, 190], dtype=np.uint8)
+upper_range = np.array([106, 255, 255], dtype=np.uint8)
+
+mask = cv2.inRange(hsv, lower_range, upper_range)
+
+kernel = np.ones((10,10),np.uint8)
+
+dilation = cv2.dilate(mask,kernel,iterations = 1)
+
+contours, hierarchy = cv2.findContours(dilation,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+resultImg = (img).copy()
+
+contour = []
+for i in range(len(contours)):
+    cnt = contours[i]
+    (x,y),radius = cv2.minEnclosingCircle(cnt)
+    center = (int(x),int(y))
+    resultImg = cv2.circle(resultImg,center,int(radius),(0,0,255),3)
+
+    len(contour)
+    #add text
+    text = "Jumlah Galon : " + str(len(contours)) + " pcs"
+    cv2.putText(resultImg, text, (500, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+    cv2.imshow('images',resultImg)
+
+    #simpan gambar kedalam folder
+    cv2.imwrite('hasil-galon.jpg', resultImg)
+
+while (1):
+    d = cv2.waitKey(0)
+    if (d == 27):
+        break
+
+cv2.destroyAllWindows()
